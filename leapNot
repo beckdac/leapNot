@@ -60,13 +60,13 @@ G21
 """
 
 
-def dwell(dwell_time):
+def setDwell(dwell_time):
     print("G4 P%d" % (dwell_time))
 
 
 def setPower(laser_power, dwell_time):
     print("M42 P45 S%d" % (int(laser_power)))
-    dwell(dwell_time)
+    setDwell(int(dwell_time))
 
 
 def setSpeed(feed_rate):
@@ -103,4 +103,4 @@ if __name__ == '__main__':
             y = MINY + (speed_n * y_sep) + (pass_n * speeds * y_sep)
             for power_n in range(powers):
                 current_power = power_increment + power_n * power_increment
-                print("%d\t%d\t%d" % (current_speed, pass_n, current_power))
+                setPower(current_power, dwell);
