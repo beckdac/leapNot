@@ -5,7 +5,7 @@ E.g. ./leapNot 6 4 4 1000 80 200 5 5 30 --dwell=0
 
 Usage:
   leapNot PASSES POWERS FEEDRATES MIN MAX X_SEP Y_SEP LENGTH\
- [--dwell=<dwell>]
+ TRAVEL [--dwell=<dwell>]
   leapNot (-h | --help)
   leapNot --version
 
@@ -18,6 +18,7 @@ Arguments:
   X_SEP     separation between test lines on X axis
   Y_SEP     separation between test lines on Y axis
   LENGTH    length of test lines
+  TRAVEL    travel speed
 
 Options:
   -h --help        Show this screen.
@@ -85,6 +86,7 @@ def setFeedRate(feed_rate):
 def moveTo(x, y, feed_rate, laser_power, dwell_time):
     setFeedRate(feed_rate)
     print("G1 X%d Y%d" % (x, y))
+    print("M400")
     setPower(laser_power, dwell_time)
 
 
@@ -104,6 +106,7 @@ if __name__ == '__main__':
     x_sep = int(args['X_SEP'])
     y_sep = int(args['Y_SEP'])
     line_length = int(args['LENGTH'])
+    travel_speed = int(args['TRAVEL'])
 
     settings = '%s' % '\n'.join('; %s: %s' % i for i in sorted(args.items()))
 
@@ -121,5 +124,5 @@ if __name__ == '__main__':
                 for power_n in range(powers):
                     power = power_increment + power_n * power_increment
                     x = MINX + (power_n * (line_length + x_sep))
-                    moveTo(x, y, feed_rate, power, dwell)
+                    moveTo(x, y, travel_speed, power, dwell)
                     moveTo(x + line_length, y, feed_rate, 0, 0)
