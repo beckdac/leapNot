@@ -8,7 +8,8 @@ measured in machine units.
 E.g. ./leapNot 6 4 4 80 200 5 5 30
 
 Usage:
-  leapNot PASSES POWERS SPEEDS MIN MAX X_SEP Y_SEP LENGTH
+  leapNot PASSES POWERS SPEEDS MIN MAX X_SEP Y_SEP LENGTH\
+ [--dwell=<dwell>]
   leapNot (-h | --help)
   leapNot --version
 
@@ -23,8 +24,9 @@ Arguments:
   LENGTH    length of test lines
 
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
+  -h --help        Show this screen.
+  --version        Show version.
+  --dwell=<dwell>  Dwell time after changing laser PWM power (ms)
 
 """
 from docopt import docopt
@@ -34,6 +36,8 @@ MAX_PWM = 255
 MINY = 10
 MINX = 10
 DWELL = 0
+# M42 is set PWM, P is in, this has pin 10 
+# for the fan and pin 45 for the laser PWM
 GCODE_FAN_PWM_FMT_STRING = "M42 P10 S%d"
 GCODE_LASER_PWM_FMT_STRING = "M42 P45 S%d"
 PREAMBLE = "; " + VERSION + """
@@ -87,6 +91,12 @@ if __name__ == '__main__':
     line_length = int(args['LENGTH'])
 
     print(PREAMBLE)
+
+    dwell = 0
+    print(args)
+    if args['--dwell'] is not None:
+        dwell = int(args['--dwell'])
+    print("; dwell = %d milliseconds" % (dwell))
 
     for speed_n in range(speeds):
         current_speed = min_speed + (speed_n * speed_increment)
