@@ -79,7 +79,7 @@ def setFeedRate(feed_rate):
     global current_feed_rate
     if current_feed_rate != feed_rate:
         print("G1 F%d" % (feed_rate))
-        currend_feed_rate = feed_rate
+        current_feed_rate = feed_rate
 
 
 def moveTo(x, y, feed_rate, laser_power, dwell_time):
@@ -112,15 +112,14 @@ if __name__ == '__main__':
     dwell = 0
     if args['--dwell'] is not None:
         dwell = int(args['--dwell'])
-    print("; dwell = %d milliseconds\n" % (dwell))
 
     for pass_this_n in range(passes):
         for feed_rate_n in range(feed_rates):
-            current_feed_rate = min_feed_rate + (feed_rate_n * feed_rate_increment)
+            feed_rate = min_feed_rate + (feed_rate_n * feed_rate_increment)
             for pass_n in range(pass_this_n, passes):
                 y = MINY + (feed_rate_n * y_sep) + (pass_n * feed_rates * y_sep)
                 for power_n in range(powers):
-                    current_power = power_increment + power_n * power_increment
+                    power = power_increment + power_n * power_increment
                     x = MINX + (power_n * (line_length + x_sep))
-                    moveTo(x, y, current_feed_rate, current_power, dwell)
-                    moveTo(x + line_length, y, current_feed_rate, 0, 0)
+                    moveTo(x, y, feed_rate, power, dwell)
+                    moveTo(x + line_length, y, feed_rate, 0, 0)
