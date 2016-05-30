@@ -93,10 +93,9 @@ if __name__ == '__main__':
     print(PREAMBLE)
 
     dwell = 0
-    print(args)
     if args['--dwell'] is not None:
         dwell = int(args['--dwell'])
-    print("; dwell = %d milliseconds" % (dwell))
+    print("; dwell = %d milliseconds\n" % (dwell))
 
     for speed_n in range(speeds):
         current_speed = min_speed + (speed_n * speed_increment)
