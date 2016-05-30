@@ -5,10 +5,10 @@ leapNot.
 Performs # of 'passes' at evenly spaced number of
 'powers' at 'speeds' intervals from 'min' to 'max'
 measured in machine units.  
-E.g. ./leapNot 6 4 4 80 200 5 5 30
+E.g. ./leapNot 6 4 4 1000 80 200 5 5 30 --dwell=0
 
 Usage:
-  leapNot PASSES POWERS SPEEDS MIN MAX X_SEP Y_SEP LENGTH\
+  leapNot PASSES POWERS TRAVEL SPEEDS MIN MAX X_SEP Y_SEP LENGTH\
  [--dwell=<dwell>]
   leapNot (-h | --help)
   leapNot --version
@@ -17,8 +17,8 @@ Arguments:
   PASSES    max number of passes in test pattern
   POWERS    number of different power settings to try
   SPEEDS    number of different speed intervals to try
-  MIN       min speed (feedrate) to try
-  MAX       max speed (feedrate) to try
+  MIN       min speed (feed rate) to try
+  MAX       max speed (feed rate) to try
   X_SEP     separation between test lines on X axis
   Y_SEP     separation between test lines on Y axis
   LENGTH    length of test lines
@@ -26,7 +26,7 @@ Arguments:
 Options:
   -h --help        Show this screen.
   --version        Show version.
-  --dwell=<dwell>  Dwell time after changing laser PWM power (ms)
+  --dwell=<dwell>  Dwell time after changing laser PWM power (ms), default = 0
 
 """
 from docopt import docopt
