@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+"""
+leapNot.
+Performs # of 'passes' at evenly spaced number of
+'powers' at 'speeds' intervals from 'min' to 'max'
+measured in machine units.  
+E.g. ./leapNot 6 4 4 80 200 5 5 30
+
+Usage:
+  leapNot PASSES POWERS SPEEDS MIN MAX X_SEP Y_SEP LENGTH
+  leapNot (-h | --help)
+  leapNot --version
+
+Arguments:
+  PASSES    max number of passes in test pattern
+  POWERS    number of different power settings to try
+  SPEEDS    number of different speed intervals to try
+  MIN       min speed to try
+  MAX       max speed to try
+  X_SEP     separation between test lines on X axis
+  Y_SEP     separation between test lines on Y axis
+  LENGTH    length of test lines
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+
+"""
+from docopt import docopt
+
+MAXPWR = 255
+
+if __name__ == '__main__':
+    args = docopt(__doc__, version='leapNot 1.0')
+
+    print(args)
+
+    speeds = int(args['<speeds>'])
+    min_speed = int(args['<min_speed>'])
+    max_speed = int(args['<max_speed>'])
+    speed_increment = (max_speed - min_speed) / (speeds);
+
+    passes = int(args['<passes>'])
+    powers = int(args['<powers>'])
+    power_increment = MAXPWR / powers;
+
+    for speed_n in range(speeds + 1):
+        current_speed = min_speed + (speed_n * speed_increment);
+        for pass_n in range(passes):
+            for power_n in range(powers):
+                current_power = power_increment + power_n * power_increment
+                print("%d\t%d\t%d" % (current_speed, pass_n, current_power));
