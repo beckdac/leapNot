@@ -2,13 +2,10 @@
 
 """
 leapNot.
-Performs # of 'passes' at evenly spaced number of
-'powers' at 'speeds' intervals from 'min' to 'max'
-measured in machine units.  
 E.g. ./leapNot 6 4 4 1000 80 200 5 5 30 --dwell=0
 
 Usage:
-  leapNot PASSES POWERS TRAVEL SPEEDS MIN MAX X_SEP Y_SEP LENGTH\
+  leapNot PASSES POWERS FEEDRATES MIN MAX X_SEP Y_SEP LENGTH\
  [--dwell=<dwell>]
   leapNot (-h | --help)
   leapNot --version
@@ -16,9 +13,9 @@ Usage:
 Arguments:
   PASSES    max number of passes in test pattern
   POWERS    number of different power settings to try
-  SPEEDS    number of different speed intervals to try
-  MIN       min speed (feed rate) to try
-  MAX       max speed (feed rate) to try
+  FEEDRATES number of different feed_rate intervals to try
+  MIN       min feed_rate (feed rate) to try
+  MAX       max feed_rate (feed rate) to try
   X_SEP     separation between test lines on X axis
   Y_SEP     separation between test lines on Y axis
   LENGTH    length of test lines
@@ -32,6 +29,7 @@ Options:
 from docopt import docopt
 
 VERSION='leapNot 1.0'
+MIN_PWM = 0
 MAX_PWM = 255
 MINY = 10
 MINX = 10
@@ -60,26 +58,41 @@ G21
 """
 
 
+current_feed_rate = None
+current_dwell = None
+
 def setDwell(dwell_time):
-    print("G4 P%d" % (dwell_time))
+    global current_dwell
+    if current_dwell != dwell_time:
+        print("G4 P%d" % (dwell_time))
+        current_dwell = dwell_time
 
 
 def setPower(laser_power, dwell_time):
-    print("M42 P45 S%d" % (int(laser_power)))
-    setDwell(int(dwell_time))
+    print("M42 P45 S%d" % (laser_power))
+    setDwell(dwell_time)
 
 
-def setSpeed(feed_rate):
-    print("G1 F%d" % (int(feed_rate)))
+def setFeedRate(feed_rate):
+    global current_feed_rate
+    if current_feed_rate != feed_rate:
+        print("G1 F%d" % (feed_rate))
+        currend_feed_rate = feed_rate
+
+
+def moveTo(x, y, feed_rate, laser_power, dwell_time):
+    setFeedRate(feed_rate)
+    print("G1 X%d Y%d" % (x, y))
+    setPower(laser_power, dwell_time)
 
 
 if __name__ == '__main__':
     args = docopt(__doc__, version=VERSION)
 
-    speeds = int(args['SPEEDS'])
-    min_speed = int(args['MIN'])
-    max_speed = int(args['MAX'])
-    speed_increment = (max_speed - min_speed) / (speeds - 1)
+    feed_rates = int(args['FEEDRATES'])
+    min_feed_rate = int(args['MIN'])
+    max_feed_rate = int(args['MAX'])
+    feed_rate_increment = (max_feed_rate - min_feed_rate) / (feed_rates - 1)
 
     passes = int(args['PASSES'])
 
@@ -97,10 +110,13 @@ if __name__ == '__main__':
         dwell = int(args['--dwell'])
     print("; dwell = %d milliseconds\n" % (dwell))
 
-    for speed_n in range(speeds):
-        current_speed = min_speed + (speed_n * speed_increment)
-        for pass_n in range(passes):
-            y = MINY + (speed_n * y_sep) + (pass_n * speeds * y_sep)
-            for power_n in range(powers):
-                current_power = power_increment + power_n * power_increment
-                setPower(current_power, dwell);
+    for pass_this_n in range(passes):
+        for feed_rate_n in range(feed_rates):
+            current_feed_rate = min_feed_rate + (feed_rate_n * feed_rate_increment)
+            for pass_n in range(pass_this_n, passes):
+                y = MINY + (feed_rate_n * y_sep) + (pass_n * feed_rates * y_sep)
+                for power_n in range(powers):
+                    current_power = power_increment + power_n * power_increment
+                    x = MINX + (power_n * (line_length + x_sep))
+                    moveTo(x, y, current_feed_rate, current_power, dwell)
+                    moveTo(x + line_length, y, current_feed_rate, 0, 0)
